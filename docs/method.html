@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#F5F5F7" />
+  <title>詳細方法 · 股票內在價值系統</title>
+  <link rel="stylesheet" href="./assets/app.css?v=1.0.2" />
+</head>
+<body class="page-method">
+  <div class="app">
+    <header class="top">
+      <div class="brand">
+        <span class="logo" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19V7l8-4 8 4v12"/><path d="M8 19v-6h8v6"/><path d="M8 10h8"/></svg>
+        </span>
+        <div>
+          <h1>詳細方法</h1>
+          <p class="sub">股票內在價值系統 v1.0 · 八模型說明</p>
+        </div>
+      </div>
+    </header>
+
+    <article class="method">
+      <a class="back" href="./index.html">← 回到觀察清單</a>
+      <h2>這頁在說明什麼</h2>
+      <p>系統用八個估值模型，依公司畫像加權，得到「內在價值（IV）」與 P25–P75 區間。數字都是<strong>假設下的條件性結論</strong>，不是成交價預測，也不是投資建議。</p>
+      <p>網頁上的價格相關欄位以<strong>資料日（程式最後一次估值）</strong>為準，不會即時跳動。因此觀察清單不顯示「現價」，以免誤當成盤中報價。</p>
+
+      <h3>① 資料從哪裡來</h3>
+      <p>財報來自東方財富 F10 標準化科目（港股對應港交所披露易、A 股對應滬深北定期報告、美股對應 SEC 10-K/10-Q）。匯率用公開 API。原始回應留在本機 <code>data/raw</code>。</p>
+
+      <h3>② 公司畫像與加權</h3>
+      <p>每檔會歸入四種畫像之一，權重不同：</p>
+      <ul>
+        <li><strong>financial</strong>：銀行／保險／證券等。FCFF 不適用，主力是剩餘收益 PB 與股利折現。</li>
+        <li><strong>growth</strong>：營收成長快且 ROIC 高。較看重業主盈餘 DCF 與達摩達蘭 FCFF。</li>
+        <li><strong>mature</strong>：成熟獲利公司（如多數大型科技／消費）。多模型並陳。</li>
+        <li><strong>loss_making</strong>：近期虧損。能算的模型變少，NCAV 可能變成下限參考。</li>
+      </ul>
+      <p>加權 IV 是「有權重且算得出來的模型」之加權平均；同時取所有模型的第 25／75 百分位當價值區間，避免單一模型帶偏。</p>
+
+      <h3>③ 八個模型：公式、適用、高低代表什麼</h3>
+
+      <div class="model-card">
+        <h4>① 葛拉漢數字</h4>
+        <p class="formula">IV = √(22.5 × EPS₃年平均 × 每股淨資產 BVPS)</p>
+        <p>來自格雷厄姆對「合理 PE×PB」的經驗上限（約 15 × 1.5）。<span class="hi-good">偏高</span>代表獲利與帳面淨值都厚；<span class="hi-bad">偏低或算不出</span>常是 EPS 為負或淨值薄。這是防禦型、偏保守的錨，不適合高成長但帳面輕的公司。</p>
+      </div>
+      <div class="model-card">
+        <h4>② 葛拉漢修正公式</h4>
+        <p class="formula">IV = EPS₃年平均 × (8.5 + 2g) × 4.4 / Y</p>
+        <p>g 為成長（系統上限 10%），Y 為該市場公司債殖利率。比「數字」多考慮成長與利率。<span class="hi-good">利率愈低、成長愈穩</span>，數值愈高；利率上升或成長被截斷時會明顯下降。成長假設被刻意封頂，避免把「故事」折成無限大。</p>
+      </div>
+      <div class="model-card">
+        <h4>③ NCAV 清算價值</h4>
+        <p class="formula">NCAV／股 = (流動資產 − 總負債) / 股數；net-net 買點 ≈ NCAV × 0.667</p>
+        <p>這是<strong>清算／淨營運資產</strong>思維，不是永續經營價值。<span class="hi-good">明顯大於 0</span> 代表就算業務停擺，流動資產還蓋得過負債；<span class="hi-bad">接近 0 或算不出</span>在輕資產、高負債科技股很常見（騰訊這類通常不是 NCAV 標的）。把它當<strong>下限參考</strong>，不要當目標價。</p>
+      </div>
+      <div class="model-card">
+        <h4>④ 巴菲特業主盈餘 DCF</h4>
+        <p class="formula">業主盈餘 ≈ 經營現金流 − 維護性資本支出（取 capex 與折舊較小者）<br/>再做約 10 年兩段折現，門檻報酬 ≈ 無風險利率 + 5.5%</p>
+        <p>問的是：把公司當「業主」，自由現金能不能以合理報酬收回。<span class="hi-good">高於市價很多</span>代表以保守折現率仍划算；<span class="hi-bad">算不出</span>多半是業主盈餘為負。終值仍佔折現很大一塊，對永續成長極敏感。</p>
+      </div>
+      <div class="model-card">
+        <h4>⑤ EPV 盈餘能力價值</h4>
+        <p class="formula">IV = 常態 NOPAT / WACC + 淨現金 + 非營運投資（打折）</p>
+        <p>假設獲利能力可以「維持現況、不再成長」。適合成熟穩定公司。<span class="hi-good">高</span>＝常態利潤厚或淨現金多；<span class="hi-bad">低</span>＝利潤薄、WACC 高，或淨現金為大幅負債。成長股會被低估，這是刻意的。</p>
+      </div>
+      <div class="model-card">
+        <h4>⑥ 達摩達蘭 FCFF 兩段 DCF</h4>
+        <p class="formula">營收成長 → 再投資（銷售／資本）→ FCFF 折現 + 終值（由 ROIC 反推再投資率）</p>
+        <p>把「故事」寫進數字：成長必須靠再投資買來。終值佔比若很高（例如 &gt;50%），代表價值大部分押在遙遠未來，<span class="hi-bad">對假設極敏感</span>。金融股不適用此模型，權重會被壓低或拿掉。</p>
+      </div>
+      <div class="model-card">
+        <h4>⑦ 剩餘收益／合理 PB</h4>
+        <p class="formula">合理 PB = (ROE − g) / (r − g)；IV = BVPS × 合理 PB</p>
+        <p>金融股主力：賺得比股權成本多，就該享有溢價 PB。<span class="hi-good">ROE 穩定高於 r</span> 時合理；若把高 ROE、高留存成長套在輕資產科技股上，<span class="hi-bad">可能算出異常高的 IV</span>（系統對騰訊這類成熟非金融股權重很低，就是這個原因）。看到單一模型特別離群，請看權重與 P25–P75，不要單點決策。</p>
+      </div>
+      <div class="model-card">
+        <h4>⑧ 股利折現（DDM）</h4>
+        <p class="formula">IV = DPS × (1+g) / (r − g)</p>
+        <p>只適合穩定發息的公司。<span class="hi-good">股息可持續且 r&gt;g</span> 時有意義；很少發息或發息不穩時數值會空或偏低。高成長留存公司不該用 DDM 當主錨。</p>
+      </div>
+
+      <h3>④ 五檔價位（P/IV）</h3>
+      <p>用<strong>資料日價格 ÷ 加權內在價值</strong>：</p>
+      <ul>
+        <li>≤ 0.50　非常便宜</li>
+        <li>≤ 0.75　便宜</li>
+        <li>≤ 1.15　合理</li>
+        <li>≤ 1.50　昂貴</li>
+        <li>&gt; 1.50　非常昂貴</li>
+      </ul>
+      <p>表上的「非常便宜 ≤」等欄位，是把 IV 乘上切點後的<strong>價格門檻</strong>，方便和未來股價對照。區間切換有約 2% 遲滯，減少邊界抖動誤報。安全邊際 MOS（預設 25%）只影響「安全買點 = IV × (1−MOS)」，<strong>不改</strong>這五檔切點。</p>
+
+      <h3>⑤ 信心分數（0–100，系統自動算）</h3>
+      <p>資料完整 28% + 歷史年數 17% + 模型分歧 27% + 獲利連續 13% + 可用模型數 15%。低於 50 建議只當篩選線索。模型之間差很大時，分歧項會把分數拉下來——這是提醒你「大家吵得很兇」，不是程式壞掉。</p>
+
+      <h3>⑥ AI 建議怎麼讀</h3>
+      <p>千問只能看到系統提供的數字與精簡 Excel，禁止外部新聞或記憶中的公司故事。推薦度 0–10 搭配星級 ★★★★☆。品質旗標非空請人工複核。AI 區間若與模型區間不同，以建議正文首句的理由為準，仍應回對財報。</p>
+
+      <h3>⑦ 已知限制</h3>
+      <ul>
+        <li>無風險利率、ERP、β、合成信用利差為近似，標「年度校準」的參數需每年檢視。</li>
+        <li>一次性損益、會計政策變更未逐項調整。</li>
+        <li>財報幣別與交易幣別不同時已換匯；股數若與行情總股本偏離過大，會改用財報反推並寫入警示。</li>
+        <li>時間序列的「日線」來自每次估值快照；剛開始只有 1 個點是正常的。財務指標年線來自歷史年報，第一次就能畫。</li>
+      </ul>
+
+      <h3>⑧ 免責</h3>
+      <p>本頁與觀察清單皆為程式化研究輔助，<strong>非投資建議</strong>。所有估值都建立在假設上，請自行覆核原始年報與模型假設後獨立決策。投資有風險。</p>
+      <p><a class="method-link" href="./index.html">← 回到觀察清單</a></p>
+    </article>
+
+    <footer class="foot">
+      <a href="./index.html">觀察清單</a>
+      <span>·</span>
+      <span>研究輔助，非投資建議</span>
+    </footer>
+  </div>
+  <button type="button" class="theme-fab" id="themeBtn" title="切換深淺色" aria-label="切換深淺色">☾</button>
+  <script>
+    (function () {
+      const btn = document.getElementById("themeBtn");
+      const saved = localStorage.getItem("iv-theme") || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+      function setTheme(t) {
+        document.documentElement.setAttribute("data-theme", t);
+        localStorage.setItem("iv-theme", t);
+        btn.textContent = t === "dark" ? "☀" : "☾";
+        document.querySelector('meta[name="theme-color"]')?.setAttribute("content", t === "dark" ? "#121212" : "#F5F5F7");
+      }
+      setTheme(saved);
+      btn.addEventListener("click", function () {
+        setTheme(document.documentElement.getAttribute("data-theme") === "dark" ? "light" : "dark");
+      });
+    })();
+  </script>
+</body>
+</html>
