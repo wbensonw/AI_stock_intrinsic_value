@@ -5,16 +5,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#F5F5F7" />
   <title>詳細方法 · 股票內在價值系統</title>
-  <link rel="icon" type="image/png" href="./favicon.png?v=1.0.4b" />
-  <link rel="apple-touch-icon" href="./assets/apple-touch-icon.png?v=1.0.4b" />
-  <link rel="stylesheet" href="./assets/app.css?v=1.0.4b" />
+  <link rel="icon" type="image/png" href="./favicon.png?v=1.0.5" />
+  <link rel="apple-touch-icon" href="./assets/apple-touch-icon.png?v=1.0.5" />
+  <link rel="stylesheet" href="./assets/app.css?v=1.0.5" />
 </head>
 <body class="page-method">
   <div class="app">
     <header class="top">
       <div class="brand">
         <a class="logo" href="./index.html" title="回首頁">
-          <img src="./assets/logo.png?v=1.0.4b" alt="股票內在價值系統" />
+          <img src="./assets/logo.png?v=1.0.5" alt="股票內在價值系統" />
         </a>
         <div>
           <h1>詳細方法</h1>
@@ -24,33 +24,34 @@
     </header>
 
     <nav class="nav-cards" aria-label="主要分頁">
-      <a class="nav-btn" href="./index.html">
+      <a class="nav-btn" href="./index.html?tab=overview">
         <span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="8" height="8" rx="1.5"/><rect x="13" y="3" width="8" height="5" rx="1.5"/><rect x="13" y="10" width="8" height="11" rx="1.5"/><rect x="3" y="13" width="8" height="8" rx="1.5"/></svg></span>
         <span>投資總覽</span>
       </a>
-      <a class="nav-btn" href="./index.html">
+      <a class="nav-btn" href="./index.html?tab=models">
         <span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v3"/><path d="M7 21h10"/><path d="M12 6c-3.5 0-6 2.2-6 6 0 2.6 1.5 4.2 4 5.3V21"/><path d="M12 6c3.5 0 6 2.2 6 6 0 2.6-1.5 4.2-4 5.3V21"/><circle cx="12" cy="11" r="1.4"/></svg></span>
         <span>估值模型</span>
       </a>
-      <a class="nav-btn" href="./index.html">
+      <a class="nav-btn" href="./index.html?tab=bands">
         <span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19V9"/><path d="M9 19V5"/><path d="M14 19v-8"/><path d="M19 19V7"/><path d="M3 19h18"/></svg></span>
         <span>五檔價位</span>
       </a>
-      <a class="nav-btn" href="./index.html">
+      <a class="nav-btn" href="./index.html?tab=metrics">
         <span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19h16"/><path d="M5 15l4.5-5.5 3.5 3 6-8"/><circle cx="19" cy="4.5" r="1.3"/></svg></span>
         <span>財務指標</span>
       </a>
-      <a class="nav-btn" href="./index.html">
+      <a class="nav-btn" href="./index.html?tab=advice">
         <span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.2 3.6L17 8l-3.8 1.4L12 13l-1.2-3.6L7 8l3.8-1.4L12 3z"/><path d="M5 16l.7 2L8 19l-2.3.8L5 22l-.7-2.2L2 19l2.3-.9L5 16z"/><path d="M18 14.5l.6 1.7 1.7.6-1.7.6-.6 1.7-.6-1.7-1.7-.6 1.7-.6.6-1.7z"/></svg></span>
         <span>AI 建議</span>
       </a>
-      <a class="nav-btn active" href="./method.html" aria-current="page">
+      <a class="nav-btn" href="./index.html?tab=method">
         <span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v6"/><circle cx="12" cy="8" r=".9" fill="currentColor" stroke="none"/></svg></span>
         <span>方法免責</span>
       </a>
     </nav>
 
     <article class="method">
+      <p><a class="method-link" href="./index.html?tab=method">← 返回方法免責</a></p>
       <p>系統用八個估值模型，依公司畫像加權，得到「內在價值（IV）」與 P25–P75 區間。數字都是<strong>假設下的條件性結論</strong>，不是成交價預測，也不是投資建議。</p>
       <p>網頁上的價格相關欄位以<strong>資料日（程式最後一次估值）</strong>為準，不會即時跳動。因此觀察清單不顯示「現價」，以免誤當成盤中報價。</p>
 
