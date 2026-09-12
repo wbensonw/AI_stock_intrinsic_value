@@ -56,6 +56,17 @@
     document.querySelector('meta[name="theme-color"]')?.setAttribute("content", t === "dark" ? "#121212" : "#F5F5F7");
   }
 
+  function applyTabFromQuery() {
+    const t = new URLSearchParams(location.search).get("tab");
+    if (t && TABS[t]) {
+      tab = t;
+      const d = DEFAULT_SORT[tab];
+      if (d) { sortKey = d[0]; sortAsc = d[1]; }
+    }
+    $$(".nav-btn").forEach((x) => x.classList.toggle("active", x.dataset.tab === tab));
+  }
+  applyTabFromQuery();
+
   $$(".nav-btn").forEach((b) => b.addEventListener("click", () => {
     tab = b.dataset.tab;
     $$(".nav-btn").forEach((x) => x.classList.toggle("active", x === b));
@@ -77,7 +88,7 @@
     .then((d) => { DATA = d; boot(); })
     .catch(() => {
       $("#metaLine").textContent = "尚未產生 latest.json。請先執行 python report_feishu.py --no-send";
-      $("#main").innerHTML = `<p class="empty">沒有可顯示的資料。</p>`;
+      $("#main").innerHTML = tab === "method" ? methodHtml() : `<p class="empty">沒有可顯示的資料。</p>`;
     });
 
   function boot() {
@@ -464,7 +475,7 @@
       <h3>⑤ 安全邊際 MOS</h3>
       <p>全域預設 25%，watchlist 的 mos= 可覆寫個股。安全買點 = IV × (1−MOS)。這是買入紀律，不會改五檔區間。</p>
       <h3>⑥ AI</h3>
-      <p>阿里雲百煉千問：qwen-long 核對精簡 Excel，qwen-plus 思考後給推薦度與建議。只能使用系統提供的數字。</p>
+      <p>阿里雲百煉千問：qwen-long 核對精簡 Excel，qwen3.8-max 思考後給推薦度與建議。只能使用系統提供的數字。</p>
       <h3>⑦ 免責</h3>
       <p>${esc(DATA?.disclaimer || "本頁為程式化研究輔助，非投資建議。")}</p>
     </article>`;
