@@ -21,7 +21,7 @@
     "葛拉漢檢查", "AI模型", "最新年報", "報表日", "估值日", "AI分析日期", "AI日期"]);
   const ALIGN_LEFT = new Set(["名稱", "行業", "標籤", "重中之重", "投資分析及建議", "警示",
     "主要風險", "模型權重", "關鍵假設", "一句話重點", "一句話重點(不考慮價格)", "200字投資建議"]);
-  const HIDE_COLS = new Set(["現價", "模型權重", "關鍵假設", "品質旗標"]);
+  const HIDE_COLS = new Set(["模型權重", "關鍵假設", "品質旗標"]);
   const MODEL_COLS = ["①葛拉漢數字", "②葛拉漢公式", "③NCAV清算", "④巴菲特業主盈餘",
     "⑤EPV盈餘能力", "⑥達摩達蘭FCFF", "⑦剩餘收益PB", "⑧股利折現"];
   const MODEL_KEYS = {
@@ -179,7 +179,17 @@
   function rowsBase() {
     const sheet = TABS[tab].sheet;
     if (!sheet || !DATA?.sheets) return [];
-    return applySearchMarket(DATA.sheets[sheet] || []);
+    return withPrice(applySearchMarket(DATA.sheets[sheet] || []));
+  }
+
+  function withPrice(rows) {
+    const ov = overviewIndex();
+    return (rows || []).map((r) => {
+      if (!isBlank(r["現價"])) return r;
+      const px = ov[r["代號"]] && ov[r["代號"]]["現價"];
+      if (isBlank(px)) return r;
+      return Object.assign({}, r, { "現價": px });
+    });
   }
 
   function rowsOf() {
@@ -216,7 +226,14 @@
 
   function visibleKeys(rows) {
     const keys = rows[0] ? Object.keys(rows[0]) : [];
-    return keys.filter((k) => !HIDE_COLS.has(k));
+    const shown = keys.filter((k) => !HIDE_COLS.has(k) && k !== "現價");
+    const hasPx = keys.includes("現價") || (rows || []).some((r) => !isBlank(r["現價"]));
+    if (hasPx) {
+      const i = shown.indexOf("名稱");
+      if (i >= 0) shown.splice(i + 1, 0, "現價");
+      else shown.unshift("現價");
+    }
+    return shown;
   }
 
   function render() {
@@ -286,12 +303,13 @@
       const name = r["名稱"] || ov["名稱"] || "";
       const mkt = ov["市場"] || r["市場"] || "";
       const bandv = bandOf(r, ov);
+      const px = r["現價"] ?? ov["現價"];
       return `<article class="item" data-i="${i}">
         <div class="item-hd">
           <div class="ico-sq">${esc(code)}</div>
           <div class="item-id">
             <h3>${esc(name)}</h3>
-            <div class="item-meta"><span class="mkt">${esc(mkt)}</span>${bandLabel(bandv)}</div>
+            <div class="item-meta"><span class="mkt">${esc(mkt)}</span><span class="px">現價 ${esc(fmt(px))}</span>${bandLabel(bandv)}</div>
           </div>
           <button type="button" class="chart-btn" data-chart="${i}" title="時間序列" aria-label="時間序列">${CHART_ICO}</button>
         </div>
@@ -439,6 +457,7 @@
       <p>${bandLabel(modelBand)} <span class="muted-sep">模型</span> · ${bandLabel(aiBand)} <span class="muted-sep">AI</span> · 信心 ${esc(isBlank(ov["信心"]) ? "--" : ov["信心"])} · <span class="stars">${esc(ov["評級"] || "--")}</span></p>
       <div class="kv">
         <b>資料日</b><span>${esc(ov["估值日"] || DATA.asof || "--")} · ${esc(ov["幣別"] || "--")}</span>
+        <b>現價</b><span>${fmt(ov["現價"])}</span>
         <b>內在價值</b><span>${fmt(ov["內在價值"])}</span>
         <b>P25–P75</b><span>${fmt(ov["價值下限P25"])} – ${fmt(ov["價值上限P75"])}</span>
         <b>折溢價</b><span class="${toneClass("折溢價%", ov["折溢價%"])}">${fmtPct(ov["折溢價%"], true)}</span>
@@ -465,7 +484,7 @@
       <h2>方法與免責</h2>
       <p><a class="method-link" href="./method.html">📖 詳細方法 — 八模型公式、數值含義與限制</a></p>
       <h3>① 資料來源</h3>
-      <p>東方財富 F10 標準化財報（港股→港交所披露易；A 股→滬深北定期報告；美股→SEC 10-K/10-Q）。匯率與即時報價於程式更新時寫入，網頁不即時報價。</p>
+      <p>東方財富 F10 標準化財報（港股→港交所披露易；A 股→滬深北定期報告；美股→SEC 10-K/10-Q）。匯率與報價於程式更新時寫入；網頁「現價」是資料日價格，不是盤中報價。</p>
       <h3>② 八個估值模型</h3>
       <p>格雷厄姆數字 / 修正公式 / NCAV、巴菲特業主盈餘 DCF、EPV、達摩達蘭 FCFF、剩餘收益 PB、股利折現。依公司畫像加權，並輸出 P25–P75 區間。</p>
       <h3>③ 五檔區間</h3>
